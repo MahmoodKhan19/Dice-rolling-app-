@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Spinning Ludo Dice · گھومتا پانسہ</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body {
+      background: linear-gradient(145deg, #1e603a 0%, #0e3a24 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, 'Roboto', sans-serif;
+      padding: 1.5rem;
+    }
+
+    .dice-app {
+      max-width: 500px;
+      width: 100%;
+      background: #fffaf0;
+      border-radius: 3rem;
+      box-shadow: 0 25px 35px -10px rgba(0, 0, 0, 0.4);
+      padding: 2rem 1.5rem 2rem;
+      text-align: center;
+      border: 1px solid #f3daa9;
+    }
+
+    .title h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #c27e3a, #9b4e1a);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title h1::before {
+      content: "🎲";
+      font-size: 2rem;
+      color: #d98e2b;
+    }
+
+    .sub {
+      font-size: 0.75rem;
+      color: #a06e3c;
+      background: #f7eedb;
+      display: inline-block;
+      padding: 0.2rem 1rem;
+      border-radius: 30px;
+      margin-top: 6px;
+    }
+
+    /* Dice container */
+    .dice-stage {
+      margin: 1.2rem 0;
+      display: flex;
+      justify-content: center;
+      perspective: 800px;
+    }
+
+    .dice {
+      background: white;
+      width: 190px;
+      height: 190px;
+      border-radius: 28px;
+      box-shadow: 0 12px 20px -6px rgba(0, 0, 0, 0.3), inset 0 1px 3px rgba(255,255,200,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s;
+      will-change: transform;
+    }
+
+    /* Spin animation (one full rotation) */
+    .spin-animation {
+      animation: diceSpin 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1) 1;
+    }
+
+    @keyframes diceSpin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Dice grid 3x3 for dots */
+    .dice-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 8px;
+      width: 80%;
+      height: 80%;
+    }
+
+    .dot-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dot {
+      width: 28px;
+      height: 28px;
+      background-color: #2d2a1e;
+      border-radius: 50%;
+      opacity: 0;
+      transform: scale(0.6);
+      transition: opacity 0.1s ease, transform 0.1s ease;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+
+    .dot.active {
+      opacity: 1;
+      transform: scale(1);
+      background: radial-gradient(circle at 35% 35%, #3b2a18, #1f170c);
+    }
+
+    /* Result area */
+    .result-area {
+      background: #f5ebdb;
+      border-radius: 50px;
+      margin: 1rem 0 1.3rem;
+      padding: 0.6rem 1rem;
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .result-label {
+      font-weight: 600;
+      color: #8b5a2e;
+      font-size: 1.1rem;
+    }
+
+    .rolled-number {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(145deg, #2c622a, #134015);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: 2px;
+    }
+
+    /* Roll button */
+    .roll-btn {
+      background: radial-gradient(circle at 30% 15%, #f5bc70, #cf8224);
+      border: none;
+      width: 80%;
+      padding: 0.9rem 0;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #2c1a0b;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: 0.1s linear;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .roll-btn:active {
+      transform: scale(0.96);
+    }
+
+    .roll-btn:disabled {
+      opacity: 0.7;
+      cursor: wait;
+    }
+
+    .footer-note {
+      margin-top: 1.2rem;
+      font-size: 0.7rem;
+      color: #b27d4a;
+      background: #fff3e6;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 0.2rem 1rem;
+      border-radius: 20px;
+    }
+
+    @media (max-width: 480px) {
+      .dice {
+        width: 150px;
+        height: 150px;
+      }
+      .dot {
+        width: 22px;
+        height: 22px;
+      }
+      .dice-grid {
+        gap: 6px;
+      }
+      .rolled-number {
+        font-size: 1.8rem;
+      }
+      .roll-btn {
+        width: 100%;
+        font-size: 1.2rem;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .dot {
+        width: 18px;
+        height: 18px;
+      }
+      .dice {
+        width: 130px;
+        height: 130px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="dice-app">
+  <div class="title">
+    <h1>Spinning Ludo Dice</h1>
+    <div class="sub">✨ SPINNING LUDO DICE ✨</div>
+  </div>
+
+  <div class="dice-stage">
+    <div class="dice" id="diceContainer">
+      <div class="dice-grid" id="diceGrid"></div>
+    </div>
+  </div>
+
+  <div class="result-area">
+    <span class="result-label"> result</span>
+    <span class="rolled-number" id="rolledValueText">—</span>
+  </div>
+
+  <button class="roll-btn" id="rollBtn">
+    <span>🌀</span>  SPIN <span>🌀</span>
+  </button>
+ا
+</div>
+
+<script>
+  // Ludo dice dot positions (3x3 grid: 0 to 8)
+  // Layout:
+  // 0 1 2
+  // 3 4 5
+  // 6 7 8
+  const DICE_PATTERNS = {
+    1: [4],
+    2: [0, 8],
+    3: [0, 4, 8],
+    4: [0, 2, 6, 8],
+    5: [0, 2, 4, 6, 8],
+    6: [0, 2, 3, 5, 6, 8]
+  };
+
+  let dotElements = [];
+  const diceGrid = document.getElementById('diceGrid');
+  const diceContainer = document.getElementById('diceContainer');
+  const rolledTextSpan = document.getElementById('rolledValueText');
+  const rollBtn = document.getElementById('rollBtn');
+
+  let isRolling = false;
+
+  // Build 3x3 dot grid
+  function buildDiceGrid() {
+    diceGrid.innerHTML = '';
+    dotElements = [];
+    for (let i = 0; i < 9; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'dot-cell';
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      cell.appendChild(dot);
+      diceGrid.appendChild(cell);
+      dotElements.push(dot);
+    }
+  }
+
+  // Show dots for given dice value (1-6)
+  function updateDiceFace(number) {
+    dotElements.forEach(dot => dot.classList.remove('active'));
+    const positions = DICE_PATTERNS[number];
+    if (positions) {
+      positions.forEach(idx => {
+        if (dotElements[idx]) dotElements[idx].classList.add('active');
+      });
+    }
+  }
+
+  // Update text result with dice symbols
+  function updateResultText(value) {
+    const symbols = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+    rolledTextSpan.textContent = `${symbols[value-1]}  ${value}  ${symbols[value-1]}`;
+  }
+
+  // Random 1-6
+  function getRandomValue() {
+    return Math.floor(Math.random() * 6) + 1;
+  }
+
+  // Perform roll: spin animation, then random result
+  function performRoll() {
+    if (isRolling) return;
+    isRolling = true;
+    rollBtn.disabled = true;
+
+    // Add spin class to dice
+    diceContainer.classList.add('spin-animation');
+
+    // After animation ends, generate final number and update
+    const handleAnimationEnd = () => {
+      diceContainer.classList.remove('spin-animation');
+      
+      const finalNumber = getRandomValue();
+      updateDiceFace(finalNumber);
+      updateResultText(finalNumber);
+      
+      isRolling = false;
+      rollBtn.disabled = false;
+      
+      diceContainer.removeEventListener('animationend', handleAnimationEnd);
+    };
+    
+    diceContainer.addEventListener('animationend', handleAnimationEnd, { once: true });
+    
+    // Fallback if animationend doesn't fire (rare)
+    setTimeout(() => {
+      if (isRolling) {
+        diceContainer.classList.remove('spin-animation');
+        const fallbackNumber = getRandomValue();
+        updateDiceFace(fallbackNumber);
+        updateResultText(fallbackNumber);
+        isRolling = false;
+        rollBtn.disabled = false;
+        diceContainer.removeEventListener('animationend', handleAnimationEnd);
+      }
+    }, 500);
+  }
+
+  // Initial setup
+  function init() {
+    buildDiceGrid();
+    const startValue = getRandomValue();
+    updateDiceFace(startValue);
+    updateResultText(startValue);
+    rollBtn.addEventListener('click', performRoll);
+  }
+
+  // Keyboard support (space/enter)
+  window.addEventListener('keydown', (e) => {
+    if ((e.code === 'Space' || e.code === 'Enter') && 
+        (document.activeElement === rollBtn || document.activeElement === document.body)) {
+      e.preventDefault();
+      performRoll();
+    }
+  });
+
+  init();
+</script>
+</body>
+</html>
